@@ -114,7 +114,7 @@ resource "azurerm_linux_virtual_machine" "management" {
   resource_group_name = azurerm_resource_group.nuwm-cloud.name
   location = azurerm_resource_group.nuwm-cloud.location
   size = "Standard_B1s"
-  admin_username = "george"
+  admin_username = "coldforeign"
   admin_password = "Pa$$word!1"
   disable_password_authentication = false
   network_interface_ids = [
@@ -185,7 +185,7 @@ resource "azurerm_linux_virtual_machine" "web" {
   resource_group_name = azurerm_resource_group.nuwm-cloud.name
   location = azurerm_resource_group.nuwm-cloud.location
   size = "Standard_B1s"
-  admin_username = "george"
+  admin_username = "coldforeign"
   admin_password = "Pa$$word!1"
   disable_password_authentication = false
   network_interface_ids = [
@@ -280,4 +280,30 @@ resource "azurerm_lb_rule" "http-rule" {
     azurerm_network_interface_backend_address_pool_association.web,
     azurerm_lb_probe.http-probe
   ]
+}
+
+// Ansible install
+
+resource "azurerm_virtual_machine_extension" "install-ansible" {
+  name = "install-ansible"
+  virtual_machine_id = azurerm_linux_virtual_machine.management.id
+  publisher = "Microsoft.Azure.Extensions"
+  type = "CustomScript"
+  type_handler_version = "2.0"
+
+  settings = <<SETTINGS
+  {
+    "commandToExecute": "sudo apt update && sudo apt install -y software-properties-common && sudo add-apt-repository --yes --update ppa:ansible/ansible && sudo apt install ansible -y"
+  }
+  SETTINGS
+}
+
+// Ansible inventory generation
+
+resource "local_file" "ansible_inventory" {
+  content = templatefile("inventory.tmpl", {
+    private_ip_addresses = azurerm_network_interface.vm-net-interface-private.*.private_ip_address
+  })
+
+  filename = "../ansible/inventory"
 }

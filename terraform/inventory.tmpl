@@ -1,0 +1,4 @@
+[web_app_servers]
+%{ for index, address in private_ip_addresses ~}
+${ private_ip_addresses[index] }
+%{ endfor ~}
