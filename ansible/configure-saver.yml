@@ -37,7 +37,7 @@
 
     - name: Install dependency
       pip:
-        name: /root/sensor-app/data-saver/requirements.txt
+        requirements: /root/sensor-app/data-saver/requirements.txt
 
     - name: Copy env file
       ansible.builtin.copy:
@@ -45,7 +45,7 @@
         dest: /root/sensor-app/data-saver/.env
 
     - name: Create structure for DB
-      shell: ./root/sensor-app/data-saver/.env && /usr/bin/python3 /root/sensor-app/data-saver/init-db.py
+      shell: /root/sensor-app/data-saver/.env && /usr/bin/python3 /root/sensor-app/data-saver/init-db.py
 
     - name: Copy daemon
       shell: cp /root/sensor-app/data-saver/etc/systemd/system/data-saver.service /etc/systemd/system/data-saver.service

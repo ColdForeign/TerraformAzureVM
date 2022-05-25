@@ -27,7 +27,7 @@
 
     - name: Install dependency
       pip:
-        name: /root/sensors-app/data-generator/requirements.txt
+        requirements: /root/sensors-app/data-generator/requirements.txt
 
     - name: Copy env file
       ansible.builtin.copy:
