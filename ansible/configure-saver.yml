@@ -1,0 +1,62 @@
+---
+- name: Install saver
+  gather_facts: true
+  become: true
+  hosts: savers_app_servers
+
+  tasks:
+    - name: Clone source code repository
+      ansible.builtin.git:
+        repo: 'https://github.com/ColdForeign/TemperatureGenerator.git'
+        dest: /root/sensor-app
+        clone: yes
+        update: yes
+
+    - name: Apt update
+      apt:
+        update_cache: yes
+
+    - name: Apt upgrade
+      apt:
+        upgrade: dist
+
+    - name: Install deps
+      apt:
+        name:
+          - python3-pip
+
+    - name: Install setup utils
+      pip:
+        name: setuptools-rust
+
+    - name: Update pip
+      pip:
+        name: pip
+        executable: pip3
+        extra_args: --upgrade
+
+    - name: Install dependency
+      pip:
+        name: /root/sensor-app/data-saver/requirements.txt
+
+    - name: Copy env file
+      ansible.builtin.copy:
+        src: ./.saver_env
+        dest: /root/sensor-app/data-saver/.env
+
+    - name: Create structure for DB
+      shell: ./root/sensor-app/data-saver/.env && /usr/bin/python3 /root/sensor-app/data-saver/init-db.py
+
+    - name: Copy daemon
+      shell: cp /root/sensor-app/data-saver/etc/systemd/system/data-saver.service /etc/systemd/system/data-saver.service
+
+    - name: Enable service
+      ansible.builtin.systemd:
+        name: data-saver.service
+        enabled: yes
+
+    - name: Start service
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        state: restarted
+        name: data-saver.service

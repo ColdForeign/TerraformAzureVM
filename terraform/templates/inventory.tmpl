@@ -1,0 +1,9 @@
+[savers_app_servers]
+%{ for index, address in savers_ip_addresses ~}
+${ savers_ip_addresses[index] }
+%{ endfor ~}
+
+[sensors_app_servers]
+%{ for index, address in sensors_ip_addresses ~}
+${ sensors_ip_addresses[index] }
+%{ endfor ~}

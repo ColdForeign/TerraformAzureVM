@@ -1,0 +1,6 @@
+[savers_app_servers]
+10.0.1.7
+
+[sensors_app_servers]
+10.0.1.4
+10.0.1.6
